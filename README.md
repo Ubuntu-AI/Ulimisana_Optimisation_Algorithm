@@ -1,5 +1,5 @@
-# Example Package
+# Ulimisana Optimisation Algorithm Package
 
-This is a simple example package. You can use
-[Github-flavored Markdown](https://guides.github.com/features/mastering-markdown/)
-to write your content.
+This is a parkage for Ulimisana Optimisation Algorithm (https://ieeexplore.ieee.org/document/9205897).
+
+Ulimisana Optimisation Algorithm is an algorithm that was inspired by Ubuntu Philosophy
