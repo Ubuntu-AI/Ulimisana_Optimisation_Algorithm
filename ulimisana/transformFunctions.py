@@ -18,7 +18,6 @@ pages={1-1},}
 
 """
 
-
 import numpy as np
 from scipy import special
 
@@ -29,6 +28,9 @@ def tanh(x):
 def no_tran_weight(x):
     return x
 
+def linear(x):
+    return x
+    
 def no_tran_term(x):
     return x
 
@@ -52,5 +54,5 @@ def algebraic(x):
 
 def erf(x):
 #    x = x.astype(float)
-    return special.erf()
+    return special.erf(x)
 

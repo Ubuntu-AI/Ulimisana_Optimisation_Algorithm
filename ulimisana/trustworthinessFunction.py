@@ -22,19 +22,22 @@ import numpy as np
 import pandas as pd
 
 
-def initialise_trust(NoOfFamilies,famID):
-#    seed(1)
-    trustNetwork = np.random.randint(2, size=(NoOfFamilies,NoOfFamilies))
-    trustNetwork = pd.DataFrame(trustNetwork,    # values
-              index=famID,    # 1st column as index
-              columns=famID)  # 1st row as the column names
+def initialise_iter_trust(NoOfFamilies):
+    """
+    This function creates empty dataframes that are used in the STN function
     
-    trustworthMatrix= np.random.randint(1, size=(NoOfFamilies,NoOfFamilies))
-    trustworthMatrix = pd.DataFrame(trustworthMatrix,    # values
-              index=famID,    # 1st column as index
-              columns=famID)  # 1st row as the column names
+    Parameter:
+    -----------
+        NoOfFamilies : The total number of families in the community
     
-    trustNetwork = trustNetwork==1
+    Return:
+    ---------
+    iter_ratings : An iteration dataframe for ratings
+    iter_evaluatedTrustworthiness : An iteration dataframe for evaluatedTrustworthiness
+    iter_adv_Trustworthiness : An iteration dataframe for advisors' Trustworthiness
+    iter_trustNetwork : An iteration dataframe for trustNetwork
+    """
+    famID = ['Family'+str(i) for i in range(0,NoOfFamilies)]
     
     iter_evaluatedTrustworthiness = pd.DataFrame(columns = famID)
     iter_evaluatedTrustworthiness['Time'] = []
@@ -44,14 +47,62 @@ def initialise_trust(NoOfFamilies,famID):
     iter_trustNetwork['Time'] = []
     iter_ratings = pd.DataFrame(columns = famID)
     iter_ratings['Time'] = []
-    return trustNetwork,trustworthMatrix,iter_ratings,iter_evaluatedTrustworthiness,iter_adv_Trustworthiness,iter_trustNetwork
+    return iter_ratings,iter_evaluatedTrustworthiness,iter_adv_Trustworthiness,iter_trustNetwork
 
-
-def trustworthinessFunction(df2,trustNetwork,adv_trustworthiness,famID,trustThreshold,epsilon,r):
+def initialise_trust(NoOfFamilies):
+    """
+    This function creates empty dataframes that are used in the STN function
     
-
+    Parameter:
+    -----------
+        NoOfFamilies : The total number of families in the community
+    
+    Return:
+    ---------
+        iter_trustNetwork : An iteration dataframe for trustNetwork
+        adv_trustworthiness : An iteration dataframe for advisors' Trustworthiness
+    """
+    
+    famID = ['Family'+str(i) for i in range(0,NoOfFamilies)]
+    trustNetwork = np.random.randint(2, size=(NoOfFamilies,NoOfFamilies))
+    trustNetwork = pd.DataFrame(trustNetwork,    # values
+              index=famID,    # 1st column as index
+              columns=famID)  # 1st row as the column names
+              
+    adv_trustworthiness= np.random.randint(1, size=(NoOfFamilies,NoOfFamilies))
+    adv_trustworthiness = pd.DataFrame(adv_trustworthiness,    # values
+              index=famID,    # 1st column as index
+              columns=famID)  # 1st row as the column names
+    
+    trustNetwork = trustNetwork==1
+    
+    return trustNetwork,adv_trustworthiness
+    
+def trustworthinessFunction(trustNetwork,adv_trustworthiness,trustThreshold,epsilon,r):
+    
+    """
+    This function calculates the trustworthiness towards advisors and other families in the community.
+    
+    Parameter:
+    -----------
+        trustNetwork : This is a dataframe that contains information abouteach family's network of advisors.
+        adv_trustworthiness : This is a dataframe indicating the trustworthiness values a family has towards its advisors.
+        trustThreshold : A scalar indicating the minimum trust threshold needed for a family to join the other family's advisors network.
+        N_min = -1/(2*epsilon**2) * np.log((1-r)/2) : Epsilon and r values are used to determine the minimum number of families needed to decide if weighted average should be used. 
+        epsilon         : 0.15 
+        r               : 0.7
+    
+    Return:
+    ---------
+        evaluatedTrustworthiness: This is a dataframe showing the trust that each family has on the other families.
+        adv_trustworthiness     : This is a dataframe showing the trustworthiness that each family has on its advisors.
+        trustNetwork            : This is a dataframe showing the advisor's network
+        ratings                 : This is a dataframe showing the ratings that each family has for the other families in the community.
+    """
+    
     N_min = -1/(2*epsilon**2) * np.log((1-r)/2)
-    evaluating_Family = df2
+    evaluating_Family = trustNetwork
+    famID = evaluating_Family.index.tolist()
     
     NoOfFamilies = len(famID)
 

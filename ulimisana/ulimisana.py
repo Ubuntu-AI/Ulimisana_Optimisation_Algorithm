@@ -29,7 +29,7 @@ phi              : [0,1] Used to specify how much the providers and wealthy fami
                        should contibute to family and community respectively
 
 
-'''Trustworthiness'''
+Trustworthiness
 epsilon        : 0.15 
 r              : 0.7
 trustThreshold : Trust Threshold for a family to become an advisor [0,1]
@@ -52,43 +52,90 @@ adv_trust : Trust towards advisors
 trust     : Trust towards all other families.
 """
 
-from . import agent_positions as ps
-from . import trustworthinessFunction as twf
-from . import ubuntuIncentives as ui
+import agent_positions as ps
+import trustworthinessFunction as twf
+import ubuntuIncentives as ui
 import numpy as np
 import pandas as pd
 
-def ulimisana(popSize,NoOfFamilies,fam_aveThreshold,com_aveThreshold,ageAverage,ageStdev,
-              objFunction,dim,lb,ub,sigFun_term,sigFun_weight,phi,epsilon,r,
-              trustThreshold,time_iter):
+def ulimisana(time_iter,popSize,NoOfFamilies,ageAverage,ageStdev,
+              objFunction,dim,lb,ub,sigFun_term,sigFun_weight,fam_aveThreshold =0.3,com_aveThreshold=0.3,phi=0.7,epsilon=0.15,r=0.7,
+              trustThreshold=0.65):
+     
+    """
+    ### INPUTS ###
+    time_iter        : Number of iterations
+    popSize          :The prefered population size
+    NoOfFamilies     : The prefered number of families
     
-    time_iter,index,individuals,df,df2,famID,iter_dx,positionlist,ind_position,ind_payoffs,fam_payoffs,comm_payoffs = ui.initialise_ubuntuIncentives(
+    ageAverage       : Average age of individuals in the each family
+    ageStdev         : Standard Deviation of age per family
+    objFunction      : The function to be solved
+    dim              : Dimensions of the objective function
+    lb               : Lower Boundary
+    ub               : Upper Boundary
+    sigFun_term      : [no_tran_term, tanh, logistic, arctan, gudermanannian, algebraic, erf]
+    sigFun_weight    : [no_tran_weight, tanh, logistic, arctan, gudermanannian, algebraic, erf]
+    fam_aveThreshold : The average threshold to show family is well off [0,1]
+    com_aveThreshold : The average threshold to show community is well off [0,1]
+    phi              : [0,1] Used to specify how much the providers and wealthy families 
+                           should contibute to family and community respectively
+
+    ## Trustworthiness
+    epsilon         : 0.15 
+    r               : 0.7
+    trustThreshold  : Trust Threshold for a family to become an advisor [0,1]
+    
+    
+    ## Transformation Functions:
+    
+
+    ### OUTPUTS ###
+
+    x_info      : Info about individual characteristics (Age and Family ID)
+    x_pos       : Individual Position
+    ind_val     :Individuals Payoff/ Objective Value
+    fam_val     :Family's Payoff (Ubuntu Incentive)
+    comm_val    : Community Payoff (Ubuntu Incentive)
+    adv_trust   : Trust towards advisors
+    trust       : Trust towards all other families.
+    """
+    
+    individuals = ['Individual'+str(i) for i in range(0,popSize)]
+    famID = ['Family'+str(i) for i in range(0,NoOfFamilies)]
+    df,ind_position,ind_payoffs,fam_payoffs,comm_payoffs = ui.initialise_ubuntuIncentives(
             NoOfFamilies,popSize,ageAverage,ageStdev,dim,lb,ub,time_iter)
-    trustNetwork,trustworthMatrix,iter_ratings,iter_evaluatedTrustworthiness,iter_adv_Trustworthiness,iter_trustNetwork = twf.initialise_trust(NoOfFamilies,famID)
-    I_update,delta_update = ps.initialise_position(individuals,index)
+    iter_ratings,iter_evaluatedTrustworthiness,iter_adv_Trustworthiness,iter_trustNetwork = twf.initialise_iter_trust(NoOfFamilies)
+    trustNetwork,adv_trustworthiness = twf.initialise_trust(NoOfFamilies)
+    I_update,delta_update = ps.initialise_position(popSize,dim,time_iter)
     
     evaluatedTrustworthiness = pd.DataFrame(columns = famID, index=famID)
     evaluatedTrustworthiness = evaluatedTrustworthiness.fillna(0.5)
+    
+    positionlist = list(df.columns)
+    positionlist.remove('age')
+    positionlist.remove('Family')
+    if 'IndPayoff' in positionlist:
+        positionlist.remove('IndPayoff')
 
-    for time_iter in range(0,time_iter):  
-        iter_idx = 'iter_'+str(time_iter)
-        pre_iter_idx = 'iter_'+str(time_iter-1)
+    for time_iter_idx in range(0,time_iter):  
+        iter_idx = 'iter_'+str(time_iter_idx)
+        pre_iter_idx = 'iter_'+str(time_iter_idx-1)
         current_iteration = iter_idx
         previous_iteration = pre_iter_idx
-        print('Iteration: ',time_iter)
+        print('Iteration: ',time_iter_idx)
         
         ind_position, ind_payoffs, fam_payoffs, comm_payoffs = ui.ubuntuIncentives(objFunction,df,
-                          positionlist,df2,famID,ind_position, ind_payoffs, fam_payoffs, comm_payoffs
-                         ,time_iter,fam_aveThreshold,com_aveThreshold ,phi,rho = 0.3)
-        if time_iter%52 ==0: 
+                          ind_position, ind_payoffs, fam_payoffs, comm_payoffs
+                         ,time_iter_idx,fam_aveThreshold,com_aveThreshold ,phi)
+        if time_iter_idx%52 ==0: 
             df['age'] += 1
     
-        ''' Trustworthiness'''
-        evaluatedTrustworthiness,adv_trustworthiness,trustNetwork,ratings = twf.trustworthinessFunction(df2,
-                            trustNetwork,trustworthMatrix,famID,trustThreshold,epsilon,r)
+        #''' Trustworthiness'''
+        evaluatedTrustworthiness,adv_trustworthiness,trustNetwork,ratings = twf.trustworthinessFunction(
+                            trustNetwork,adv_trustworthiness,trustThreshold,epsilon,r)
         evaluatedTrustworthiness['Time'] = iter_idx
         trustNetwork['Time'] = iter_idx
-        adv_trustworthiness = trustworthMatrix
         adv_trustworthiness['Time'] = iter_idx
         ratings['Time'] = iter_idx
     
@@ -100,7 +147,7 @@ def ulimisana(popSize,NoOfFamilies,fam_aveThreshold,com_aveThreshold,ageAverage,
         trustNetwork =trustNetwork.drop(columns='Time')
         evaluatedTrustworthiness =evaluatedTrustworthiness.drop(columns='Time')
         adv_trustworthiness = adv_trustworthiness.drop(columns='Time')
-        ''' Update Individual Positions'''
+        #''' Update Individual Positions'''
     
         for i in famID:
             globalbestComm,bestComFamID,bestComm   = ps.commGlobalBest(df,comm_payoffs,fam_payoffs,ind_payoffs,ind_position) 
