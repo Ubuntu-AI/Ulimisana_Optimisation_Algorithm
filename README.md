@@ -983,7 +983,7 @@ fig = convergenceRatePlot(ind_val,objFunction)
 ```
 
 <!-- ![penholder.png](attachment:penholder.png) -->
-<img src="penholder.png">
+<img src="./img/penholder.png">
 
 #### Family Convergence Curve
 
@@ -992,7 +992,7 @@ fig = convergenceRatePlot(ind_val,objFunction)
 fig = convergenceRatePlot(fam_val,objFunction)
 ```
 
-<img src="./penholder_fam.png">
+<img src="./img/penholder_fam.png">
 
 #### Community Payoff Convergence Curve
 
@@ -1001,16 +1001,16 @@ fig = convergenceRatePlot(fam_val,objFunction)
 fig = convergenceRatePlot(comm_val,objFunction)
 ```
 
-<img src="./penholder_comm.png">
+<img src="./img/penholder_comm.png">
 
 
 ```python
 fig1,fig2 = animated2Dvisualisation(x_info,x_pos,lb,ub)
 ```
 
-<img src="./animatedVisualisation.png">
+<img src="./img/animatedVisualisation.png">
 
-<img src="./animatedVisualisation_fam.png">
+<img src="./img/animatedVisualisation_fam.png">
 
 The Source Code for this Package can be found in https://github.com/joshua-maumela/UlimisanaOptimisationAlgorithm
 
