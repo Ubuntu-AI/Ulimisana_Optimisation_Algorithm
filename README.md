@@ -1012,7 +1012,7 @@ fig1,fig2 = animated2Dvisualisation(x_info,x_pos,lb,ub)
 
 <img src="./img/animatedVisualisation_fam.png">
 
-The Source Code for this Package can be found in https://github.com/joshua-maumela/UlimisanaOptimisationAlgorithm
+The Source Code for this Package can be found in https://github.com/Ubuntu-AI/Ulimisana_Optimisation_Algorithm
 
 For all suggestions and collaboration requests, send email to the Ubuntu AI Research Group at ubuntu.inspired.ai@gmail.com
 

@@ -1052,7 +1052,7 @@ Community Payoff Convergence Curve
 
 
 The Source Code for this Package can be found in
-https://github.com/joshua-maumela/UlimisanaOptimisationAlgorithm
+https://github.com/Ubuntu-AI/Ulimisana_Optimisation_Algorithm
 
 For all suggestions and collaboration requests, send email to the Ubuntu
 AI Research Group at ubuntu.inspired.ai@gmail.com
