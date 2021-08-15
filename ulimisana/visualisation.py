@@ -35,7 +35,7 @@ def agent2Dposition(x_info,agent_position):
     result = result.sort_values(by=['iter'], ascending=True)
     return result
 
-def position2Dplot(result,lb,ub):
+def position2Dplot(result,lb,ub,render):
     ''' 
     This function uses the ploty package to plot the results.
     Parameters:
@@ -54,7 +54,7 @@ def position2Dplot(result,lb,ub):
     from plotly.subplots import make_subplots
     import numpy as np
     import pandas as pd
-    pio.renderers.default = 'browser'
+    pio.renderers.default = render
     fig = px.scatter(result, x="IndPosition0",y = "IndPosition1", 
            animation_frame="iter",
            animation_group="index",color="Family",hover_name="index",title='<br>Individual Position<br>',log_x=False, 
@@ -67,7 +67,7 @@ def position2Dplot(result,lb,ub):
 
     return fig.show(),fig2.show()
 
-def animated2Dvisualisation(df,agent_position,lb,ub):
+def animated2Dvisualisation(x_info,x_pos,lb,ub,render='notebook_connected'):
     '''
     This function plots the animated plots showing how each agent moved around in the community and within their family in search of the optimal solution. 
     Parameters:
@@ -76,6 +76,7 @@ def animated2Dvisualisation(df,agent_position,lb,ub):
     agent_position: This is the dataframe that contains all the updated positions for each agent at different iterations.
     lb : Lower Bounds
     ub : Upper Bounds
+    render      : This is the render options as defined by help(plotly.io.renderers)
     
     Returns:
     ------------
@@ -88,18 +89,19 @@ def animated2Dvisualisation(df,agent_position,lb,ub):
     from plotly.subplots import make_subplots
     import numpy as np
     import pandas as pd
-    pio.renderers.default = 'browser'
+    pio.renderers.default = render
     result = agent2Dposition(x_info,x_pos)
-    fig1,fig2 = position2Dplot(result,lb,ub)
+    fig1,fig2 = position2Dplot(result,lb,ub,render)
     return fig1,fig2
     
-def convergenceRatePlot(ind_payoffs,objFunction):
+def convergenceRatePlot(ind_payoffs,objFunction,render='notebook_connected'):
     '''
     This function plots the convergence curve of the obejective function being investigated.
     Parameters:
     -------------
     ind_payoffs : These are the objective values of all agents in the community.
-    objFunction : This is the objective function being solved for. 
+    objFunction : This is the objective function being solved for.
+    render      : This is the render options as defined by help(plotly.io.renderers)
     
     Returns:
     ------------
@@ -111,9 +113,9 @@ def convergenceRatePlot(ind_payoffs,objFunction):
     from plotly.subplots import make_subplots
     import numpy as np
     import pandas as pd
-    pio.renderers.default = 'browser'
+    pio.renderers.default = render
     data = ind_payoffs.reset_index(drop=True)
-    data['Objective Value'] = np.mean(-1*data,axis=1)
+    data['Objective Value'] = np.mean(data,axis=1)
     data['Iteration'] = data.index
     fig = px.line(data, x='Iteration',y = "Objective Value",
               title=objFunction.__name__ + '<br>Convergence Rate<br>',

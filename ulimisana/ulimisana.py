@@ -52,9 +52,9 @@ adv_trust : Trust towards advisors
 trust     : Trust towards all other families.
 """
 
-import agent_positions as ps
-import trustworthinessFunction as twf
-import ubuntuIncentives as ui
+from . import agent_positions as ps
+from . import trustworthinessFunction as twf
+from . import ubuntuIncentives as ui
 import numpy as np
 import pandas as pd
 
@@ -206,8 +206,8 @@ def ulimisana(time_iter,popSize,NoOfFamilies,ageAverage,ageStdev,
         IndividualPayoff =  -1*objFunction(x)
         ind_payoffs.loc[iter_idx,individuals] =  np.transpose(IndividualPayoff)
         df['IndPayoff'] = np.array(IndividualPayoff)
-        print('mean: ',np.mean(df['IndPayoff']))
-        print('mim : ',np.min(df['IndPayoff']))
-        print('max : ',np.max(df['IndPayoff']))
-
-    return df,I_update,ind_payoffs,fam_payoffs,comm_payoffs,iter_adv_Trustworthiness,iter_evaluatedTrustworthiness
+        print('mean: ',np.mean(-1*df['IndPayoff']))
+        print('min : ',np.min(-1*df['IndPayoff']))
+        print('max : ',np.max(-1*df['IndPayoff']))
+    df['IndPayoff'] = np.array(-1*IndividualPayoff)
+    return df,I_update,-1*ind_payoffs,-1*fam_payoffs,-1*comm_payoffs,iter_adv_Trustworthiness,iter_evaluatedTrustworthiness
